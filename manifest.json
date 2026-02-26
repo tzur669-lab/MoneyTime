@@ -3,7 +3,7 @@
   "name": "מעקב שעות",
   "short_name": "מעקב שעות",
   "description": "אפליקציה אישית למעקב שעות עבודה",
-  "start_url": "/",
+  "start_url": "/MoneyTime/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
