@@ -373,7 +373,6 @@
             });
         }
 
-
         // --- Google Sync Core ---
         const CLIENT_ID = '57616527068-9ogg9tnmgcku8icu5bjkvd7e48b9hujs.apps.googleusercontent.com';
         const SCOPES = 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email';
@@ -489,24 +488,30 @@
             finally { btn.innerText = "🔄 בצע סנכרון ידני עכשיו"; btn.disabled = false; }
         }
 
-        // --- Core Logic ---
+        // --- המנוע העברי המתוקן והמדויק המבוסס על הדפדפן ---
         const HebrewCal = (function() {
-            const HEBREW_MONTHS = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'];
             function gematriya(num) {
                 const ones=['','א','ב','ג','ד','ה','ו','ז','ח','ט'], tens=['','י','כ','ל','מ','נ','ס','ע','פ','צ'];
                 if(num===15) return 'ט״ו'; if(num===16) return 'ט״ז';
                 let res = (tens[Math.floor((num%100)/10)] || '') + (ones[num%10] || '');
                 return res.length>1 ? res.slice(0,-1)+'״'+res.slice(-1) : res+'׳';
             }
-            const roshHashanah = {
-                2024:new Date(2024,9,3), 2025:new Date(2025,8,23), 2026:new Date(2026,8,12), 2027:new Date(2027,9,2), 2028:new Date(2028,8,21), 2029:new Date(2029,8,10), 2030:new Date(2030,8,28),2031:new Date(2031,8,18), 2032:new Date(2032,8,6), 2033:new Date(2033,8,24),2034:new Date(2034,8,14), 2035:new Date(2035,9,4), 2036:new Date(2036,8,22),2037:new Date(2037,8,10), 2038:new Date(2038,8,30), 2039:new Date(2039,8,19),2040:new Date(2040,8,8)
-            };
             function format(gDate) {
-                let y = gDate.getFullYear(); let rh = roshHashanah[y] || new Date(y, 8, 15);
-                if (gDate < rh) { y--; rh = roshHashanah[y] || new Date(y, 8, 15); }
-                let diff = Math.floor((gDate - rh) / 86400000);
-                let hMonth = 1; while(diff >= 30) { diff -= 30; hMonth++; }
-                return gematriya(diff + 1) + ' ' + HEBREW_MONTHS[(hMonth - 1) % 12];
+                try {
+                    const formatter = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long' });
+                    const parts = formatter.formatToParts(gDate);
+                    let dayStr = '', monthName = '';
+                    for (let p of parts) {
+                        if (p.type === 'day') {
+                            const num = parseInt(p.value, 10);
+                            dayStr = isNaN(num) ? p.value : gematriya(num);
+                        }
+                        if (p.type === 'month') monthName = p.value;
+                    }
+                    return dayStr + ' ' + monthName;
+                } catch(e) {
+                    return ''; 
+                }
             }
             return { format };
         })();
